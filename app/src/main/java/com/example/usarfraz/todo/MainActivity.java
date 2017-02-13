@@ -3,6 +3,7 @@ package com.example.usarfraz.todo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,12 +13,9 @@ import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<String> todoItems;
@@ -26,7 +24,11 @@ public class MainActivity extends AppCompatActivity {
     ListView lvItems;
     EditText etEditText;
 
+    private static int idCounter;
     private final int REQUEST_CODE = 20;
+    private final int ADD = 1;
+    private final int EDIT = 2;
+    private final int DELETE = 3;
 
     public void populateArrayItems() {
         readItems();
@@ -35,29 +37,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void readItems() {
         todoList = SQLite.select().from(Todo.class).queryList();
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try {
-            todoItems = new ArrayList<String>(FileUtils.readLines(file, "UTF-8"));
-        } catch (IOException e) {
-            todoItems = new ArrayList<String>();
+        todoItems = new ArrayList<String>();
+        for (Todo todo: todoList) {
+            todoItems.add(todo.taskName);
         }
     }
 
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(file, "UTF-8", todoItems);
-        } catch (IOException e) {
-
+    private void writeItems(int position, int op){
+        if (op == ADD) {
+            Todo todo = new Todo();
+            todo.id = idCounter++;
+            todo.taskName = todoItems.get(position);
+            todoList.add(todo);
+            todo.save();
+        } else if (op == EDIT) {
+            Todo todo = todoList.get(position);
+            todo.taskName = todoItems.get(position);
+            todo.save();
+        } else {
+            todoList.get(position).delete();
+            todoList.remove(position);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         populateArrayItems();
+        idCounter = todoList.size();
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(aToDoAdapter);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onItemLongClick(AdapterView<?>parent, View view, int position, long id) {
                         todoItems.remove(position);
                         aToDoAdapter.notifyDataSetChanged();
-                        writeItems();
+                        writeItems(position, DELETE);
                         return true;
                     }
                 });
@@ -84,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     public void onAddItem(View view) {
         aToDoAdapter.add(etEditText.getText().toString());
         etEditText.setText("");
-        writeItems();
+        writeItems(todoItems.size()-1, ADD);
     }
 
     @Override
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             int position =  data.getExtras().getInt("position");
             todoItems.set(position, data.getExtras().getString("saveItem"));
             aToDoAdapter.notifyDataSetChanged();
-            writeItems();
+            writeItems(position, EDIT);
         }
     }
 }
