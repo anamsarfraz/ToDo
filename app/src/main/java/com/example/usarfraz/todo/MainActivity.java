@@ -15,8 +15,9 @@ import android.widget.ListView;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.example.usarfraz.todo.ModifyToDoFragment.OnFragmentInteractionListener;
+import com.example.usarfraz.todo.ConfirmationFragment.DeleteToDoDialogListener;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener, DeleteToDoDialogListener {
     Cursor todoCursor;
     TodoCursorAdapter todoAdapter;
     ListView lvItems;
@@ -48,12 +49,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
                     public boolean onItemLongClick(AdapterView<?>parent, View view, int position, long id) {
                         todoCursor.moveToPosition(position);
-                        int colIndex = todoCursor.getColumnIndex("_id");
-                        int itemId = todoCursor.getInt(colIndex);
-                        Todo todo = SQLite.select().from(Todo.class).where(Todo_Table._id.eq(itemId)).querySingle();
-                        todo.delete();
-                        todoCursor = SQLite.select().from(Todo.class).query();
-                        todoAdapter.changeCursor(todoCursor);
+                        FragmentManager fm = getSupportFragmentManager();
+                        ConfirmationFragment modifyTodoFragment = ConfirmationFragment.newInstance("Confirm deletion");
+                        modifyTodoFragment.show(fm, "fragment_delete_todo");
                         //todoAdapter.notifyDataSetChanged();
                         return true;
                     }
@@ -85,18 +83,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             case R.id.item_add:
                 Todo todo = new Todo();
                 todo.id = idCounter++;
-                /*todoCursor.moveToLast();
-                Todo todo = new Todo();
-                todo.id = idCounter++;
-                todo.taskName = etEditText.getText().toString();
-                etEditText.setText("");
-                todo.save();
-                todoCursor = SQLite.select().from(Todo.class).query();
-                todoAdapter.changeCursor(todoCursor);
-                */
-                FragmentManager fm = getSupportFragmentManager();
-                ModifyToDoFragment modifyTodoFragment = ModifyToDoFragment.newInstance(todo);
-                modifyTodoFragment.show(fm, "fragment_modify_todo");
+                Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+                i.putExtra("todo", todo); // pass item data to edit activity
+                startActivityForResult(i, REQUEST_CODE);
 
                 return true;
 
@@ -122,4 +111,14 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         todoCursor = SQLite.select().from(Todo.class).query();
         todoAdapter.changeCursor(todoCursor);
     }
+
+    public void onConfirmDeleteDialog() {
+        int colIndex = todoCursor.getColumnIndex("_id");
+        int itemId = todoCursor.getInt(colIndex);
+        Todo todo = SQLite.select().from(Todo.class).where(Todo_Table._id.eq(itemId)).querySingle();
+        todo.delete();
+        todoCursor = SQLite.select().from(Todo.class).query();
+        todoAdapter.changeCursor(todoCursor);
+    }
+
 }

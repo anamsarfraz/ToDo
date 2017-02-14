@@ -3,11 +3,19 @@ package com.example.usarfraz.todo;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static android.R.attr.value;
 
 /**
  * Created by usarfraz on 2/13/17.
@@ -32,11 +40,41 @@ public class TodoCursorAdapter extends CursorAdapter {
         // Find fields to populate in inflated template
         TextView tvTaskName = (TextView) view.findViewById(R.id.tvTaskName);
         TextView tvPriority = (TextView) view.findViewById(R.id.tvPriority);
+        TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
         // Extract properties from cursor
-        String body = cursor.getString(cursor.getColumnIndexOrThrow("taskName"));
+        String taskName = cursor.getString(cursor.getColumnIndexOrThrow("taskName"));
         int priority = cursor.getInt(cursor.getColumnIndexOrThrow("priority"));
+        long dueDate = cursor.getLong(cursor.getColumnIndexOrThrow("dueDate"));
         // Populate fields with extracted properties
-        tvTaskName.setText(body);
-        tvPriority.setText(String.valueOf(priority));
+        String priorityStr;
+        int color;
+        switch(priority) {
+            case 0:
+                priorityStr = "LOW";
+                color = Color.GREEN;
+                break;
+            case 1:
+                priorityStr = "MEDIUM";
+                color = Color.rgb(255, 215, 0);
+                break;
+            case 2:
+                priorityStr = "HIGH";
+                color = Color.RED;
+                break;
+            default:
+                priorityStr = "LOW";
+                color = Color.GREEN;
+                break;
+        }
+        tvTaskName.setText(taskName);
+        tvPriority.setText(priorityStr);
+        tvPriority.setTextColor(color);
+
+        DateFormat df = new SimpleDateFormat("MMM, dd yyyy");
+        tvDate.setText("Due: "+df.format(dueDate));
+
+
+
+
     }
 }

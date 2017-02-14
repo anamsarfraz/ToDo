@@ -13,8 +13,6 @@ import android.widget.Spinner;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.raizlabs.android.dbflow.config.FlowLog.Level.D;
-
 public class EditItemActivity extends AppCompatActivity {
 
     EditText etEditText;
@@ -45,7 +43,7 @@ public class EditItemActivity extends AppCompatActivity {
         etTaskNotes.setSelection(etTaskNotes.getText().length());
 
         cal = Calendar.getInstance();
-        cal.setTime(todo.dueDate == null ? new Date() : todo.dueDate);
+        cal.setTime(todo.dueDate == 0 ? new Date() : new Date(todo.dueDate));
         datePicker.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
 
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -83,7 +81,7 @@ public class EditItemActivity extends AppCompatActivity {
                 todo.taskName = etEditText.getText().toString();
                 todo.notes = etTaskNotes.getText().toString();
                 cal.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                todo.dueDate = cal.getTime();
+                todo.dueDate = cal.getTimeInMillis();
                 todo.priority = prioritySpinner.getSelectedItemPosition();
                 todo.status = statusSpinner.getSelectedItemPosition();
 

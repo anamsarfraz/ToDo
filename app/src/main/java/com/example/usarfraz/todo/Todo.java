@@ -26,7 +26,7 @@ public class Todo extends BaseModel implements Serializable {
     String taskName;
 
     @Column
-    Date dueDate;
+    long dueDate;
 
     // low = 0, medium = 1, high = 2;
     @Column
