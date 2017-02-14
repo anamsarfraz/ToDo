@@ -28,11 +28,11 @@ public class Todo extends BaseModel implements Serializable {
     @Column
     Date dueDate;
 
-    // low = 1, medium = 2, high = 3;
+    // low = 0, medium = 1, high = 2;
     @Column
     int priority;
 
-    // to_do = 1, inprogress = 2, done = 3
+    // to_do = 0, inprogress = 1, done = 2
     @Column
     int status;
 

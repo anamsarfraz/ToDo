@@ -2,19 +2,21 @@ package com.example.usarfraz.todo;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.example.usarfraz.todo.ModifyToDoFragment.OnFragmentInteractionListener;
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
     Cursor todoCursor;
     TodoCursorAdapter todoAdapter;
     ListView lvItems;
@@ -77,16 +79,29 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void onAddItem(View view) {
-        todoCursor.moveToLast();
-        Todo todo = new Todo();
-        todo.id = idCounter++;
-        todo.taskName = etEditText.getText().toString();
-        etEditText.setText("");
-        todo.save();
-        todoCursor = SQLite.select().from(Todo.class).query();
-        todoAdapter.changeCursor(todoCursor);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_add:
+                Todo todo = new Todo();
+                todo.id = idCounter++;
+                /*todoCursor.moveToLast();
+                Todo todo = new Todo();
+                todo.id = idCounter++;
+                todo.taskName = etEditText.getText().toString();
+                etEditText.setText("");
+                todo.save();
+                todoCursor = SQLite.select().from(Todo.class).query();
+                todoAdapter.changeCursor(todoCursor);
+                */
+                FragmentManager fm = getSupportFragmentManager();
+                ModifyToDoFragment modifyTodoFragment = ModifyToDoFragment.newInstance(todo);
+                modifyTodoFragment.show(fm, "fragment_modify_todo");
 
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -100,5 +115,11 @@ public class MainActivity extends AppCompatActivity {
             todoAdapter.changeCursor(todoCursor);
             //todoAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void onFragmentInteraction(Todo todo) {
+        todo.save();
+        todoCursor = SQLite.select().from(Todo.class).query();
+        todoAdapter.changeCursor(todoCursor);
     }
 }

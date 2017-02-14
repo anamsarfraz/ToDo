@@ -3,4 +3,23 @@
     <string name="add">Add</string>
     <string name="add_item">Add New Item...</string>
     <string name="save">Save</string>
+    <string name="task_name">Task Name</string>
+    <string name="due_date">Due Date</string>
+    <string name="task_note">Task Notes</string>
+    <string name="priority">Priority</string>
+    <string name="status">Status</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="status_array">
+        <item>To Do</item>
+        <item>In progress</item>
+        <item>Done</item>
+    </string-array>
+
+    <string-array name="priority_array">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+
 </resources>
