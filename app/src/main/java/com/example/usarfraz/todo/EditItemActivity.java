@@ -9,7 +9,7 @@ import android.widget.EditText;
 public class EditItemActivity extends AppCompatActivity {
 
     EditText etEditText;
-    int editPosition;
+    Todo todo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,8 +17,8 @@ public class EditItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_item);
 
         etEditText = (EditText) findViewById(R.id.etEditText);
-        etEditText.setText(getIntent().getStringExtra("editItem"));
-        editPosition = getIntent().getIntExtra("position", 0);
+        todo = (Todo) getIntent().getSerializableExtra("todo");
+        etEditText.setText(todo.taskName);
         etEditText.setSelection(etEditText.getText().length());
     }
 
@@ -26,8 +26,8 @@ public class EditItemActivity extends AppCompatActivity {
     public void onSave(View view) {
         Intent data = new Intent();
         // Pass relevant data back as a result
-        data.putExtra("saveItem", etEditText.getText().toString());
-        data.putExtra("position", editPosition);
+        todo.taskName = etEditText.getText().toString();
+        data.putExtra("todo", todo);
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response
         finish(); // closes the activity, pass data to parent

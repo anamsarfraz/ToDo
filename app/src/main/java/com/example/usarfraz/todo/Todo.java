@@ -6,6 +6,7 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,9 +14,11 @@ import java.util.Date;
  */
 
 @Table(database = TodoDatabase.class)
-public class Todo extends BaseModel {
+public class Todo extends BaseModel implements Serializable {
 
-    @Column
+    private static final long serialVersionUID = 5177222050535318633L;
+
+    @Column(name="_id")
     @PrimaryKey
     int id;
 
